@@ -1,70 +1,49 @@
-import { Task, TaskPayload } from '../models/task';
-import { v4 as uuidv4 } from 'uuid';
+import { PrismaClient } from '@prisma/client';
+import { TaskPayload } from '../models/task';
 
-interface TaskFilters {
-  status?: string;
-  search?: string;
+const prisma = new PrismaClient();
+
+export async function findAll(filters?: { status?: string; search?: string }) {
+  return prisma.task.findMany({
+    where: {
+      ...(filters?.status ? { status: filters.status } : {}),
+      ...(filters?.search
+        ? { title: { contains: filters.search} }
+        : {}),
+    },
+  });
 }
 
-const tasks: Task[] = [];
-
-export function findAll(filters?: TaskFilters): Task[] {
-  let result = [...tasks];
-
-    if (filters?.status) {
-      result = result.filter(t => t.status === filters.status);
-    }
-
-    if(filters?.search) {
-      const searchLower = filters.search.toLowerCase();
-      result = result.filter(t =>
-        t.title.toLowerCase().includes(searchLower) ||
-        t.description.toLowerCase().includes(searchLower)
-      );
-    }
-  
-  return result
+export async function findById(id: string) {
+  return prisma.task.findUnique({ where: { id } });
 }
 
-export function findById(id: string): Task | undefined {
-  return tasks.find(t => t.id === id);
+export async function create(payload: TaskPayload) {
+  return prisma.task.create({
+    data: {
+      title: payload.title,
+      description: payload.description ?? '',
+      status: payload.status ?? 'todo',
+      priority: payload.priority ?? 'medium',
+    },
+  });
 }
 
-export function create(payload: TaskPayload): Task {
-  const now = new Date().toISOString();
-  const task: Task = {
-    id: uuidv4(),
-    title: String(payload.title),
-    description: payload.description ? String(payload.description) : '',
-    status: (payload.status ?? 'todo') as Task['status'],
-    priority: (payload.priority ?? 'medium') as Task['priority'],
-    createdAt: now,
-    updatedAt: now
-  };
-  tasks.push(task);
-  return task;
+export async function update(id: string, payload: Partial<TaskPayload>) {
+  const data: any = {};
+  if (payload.title) data.title = payload.title;
+  if (payload.description) data.description = payload.description;
+  if (payload.status) data.status = payload.status;
+  if (payload.priority) data.priority = payload.priority;
+
+  return prisma.task.update({
+    where: { id },
+    data,
+  });
 }
 
-export function update(id: string, payload: Partial<TaskPayload>): Task | null {
-  const index = tasks.findIndex(t => t.id === id);
-  if (index === -1) return null;
-  const current = tasks[index];
-  if (!current) return null;
-  const updated: Task = {
-    ...current,
-    title: payload.title !== undefined ? String(payload.title) : current.title,
-    description: payload.description !== undefined ? String(payload.description) : current.description,
-    status: payload.status ?? current.status,
-    priority: payload.priority ?? current.priority,
-    updatedAt: new Date().toISOString()
-  };
-  tasks[index] = updated;
-  return updated;
-}
 
-export function remove(id: string): boolean {
-  const index = tasks.findIndex(t => t.id === id);
-  if (index === -1) return false;
-  tasks.splice(index, 1);
+export async function remove(id: string) {
+  await prisma.task.delete({ where: { id } });
   return true;
 }
