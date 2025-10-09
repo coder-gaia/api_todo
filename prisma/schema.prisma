@@ -19,6 +19,7 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
+  role      Role     @default(OWNER)
   createdAt DateTime @default(now())
 
   boards      BoardMember[]

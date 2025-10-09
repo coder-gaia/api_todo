@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
+import { PrismaClient, Role } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface AuthRequest extends Request {
   user?: {
@@ -46,4 +49,26 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
 
   req.user = payload as { userId: string; username: string; role?: string };
   next();
+}
+
+export async function addMember(req: Request<{ boardId: string }>, res: Response) {
+  const { boardId } = req.params;
+  const { userId, role } = req.body;
+
+  if (!userId || !role) {
+    return res.status(400).json({ message: 'userId and role are required' });
+  }
+
+  const board = await prisma.board.findUnique({ where: { id: boardId } });
+  if (!board) return res.status(404).json({ message: 'Board not found' });
+
+  const member = await prisma.boardMember.create({
+    data: {
+      boardId,
+      userId,
+      role: role as Role,
+    },
+  });
+
+  return res.status(201).json(member);
 }
