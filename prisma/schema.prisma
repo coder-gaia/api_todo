@@ -7,12 +7,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  boards      BoardMember[]
+  ownedBoards Board[]       @relation("ownerBoards")
+
+  ownedTasks Task[] @relation("TaskOwner")
+}
+
+model Board {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  ownerId     String
+  owner       User          @relation("ownerBoards", fields: [ownerId], references: [id])
+  members     BoardMember[]
+  tasks       Task[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model BoardMember {
+  id        String   @id @default(uuid())
+  board     Board    @relation(fields: [boardId], references: [id])
+  boardId   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  role      Role
+  createdAt DateTime @default(now())
+
+  @@unique([boardId, userId])
+}
+
 model Task {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   title       String
   description String
   status      String
   priority    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  boardId     String
+  board       Board  @relation(fields: [boardId], references: [id])
+
+  ownerId String?
+  owner   User?   @relation("TaskOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -16,4 +16,6 @@ export interface TaskPayload {
   description?: string;
   status?: Status;
   priority?: Priority;
+  boardId: string;
+  ownerId?: string | null;
 }
