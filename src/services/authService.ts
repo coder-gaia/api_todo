@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
 export async function register({ username, email, password }: { username: string; email: string; password: string }) {
@@ -22,7 +21,7 @@ export async function login({ email, password }: { email: string; password: stri
   if (!match) throw new Error('Invalid password');
 
   const token = jwt.sign(
-    { userId: user.id, username: user.username },
+    { userId: user.id, username: user.username, role: user.role ?? null },
     JWT_SECRET,
     { expiresIn: '1d' }
   );

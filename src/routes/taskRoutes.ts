@@ -1,13 +1,15 @@
 import { Router } from 'express';
-import { listTasks, getTask, createTask, updateTask, deleteTask } from '../controllers/taskController';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { requireAdminOrOwnerForTask } from '../middlewares/roleMiddleware';
+import { createTask, updateTask, deleteTask, listTasks, getTask } from '../controllers/taskController';
 
 const router = Router();
 
-router.get('/', listTasks);
-router.get('/:id', getTask);
-router.post('/', authMiddleware, createTask);
-router.put('/:id', authMiddleware, updateTask);
-router.delete('/:id', authMiddleware, deleteTask);
+router.get('/', authMiddleware, listTasks);
+router.get('/:id', authMiddleware, getTask);
+
+router.post('/', authMiddleware, requireAdminOrOwnerForTask(), createTask);
+router.put('/:id', authMiddleware, requireAdminOrOwnerForTask(), updateTask);
+router.delete('/:id', authMiddleware, requireAdminOrOwnerForTask(), deleteTask);
 
 export default router;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createBoard } from '../controllers/boardController';
-import { addMember, authMiddleware } from '../middlewares/authMiddleware';
+import { addMember, createBoard } from '../controllers/boardController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 

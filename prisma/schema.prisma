@@ -10,8 +10,6 @@ datasource db {
 enum Role {
   OWNER
   ADMIN
-  EDITOR
-  VIEWER
 }
 
 model User {
@@ -19,7 +17,7 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
-  role      Role     @default(OWNER)
+  role      Role?    
   createdAt DateTime @default(now())
 
   boards      BoardMember[]
