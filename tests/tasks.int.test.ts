@@ -27,7 +27,6 @@ describe('Tasks integration', () => {
       .send({ title: 'Board for create task' });
     const boardId = boardRes.body.id;
 
-    // Cria a task
     const res = await request(app)
       .post('/tasks')
       .set('Authorization', `Bearer ${ownerToken}`)
