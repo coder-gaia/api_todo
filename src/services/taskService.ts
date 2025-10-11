@@ -30,23 +30,20 @@ export async function create(payload: TaskPayload & { boardId: string; ownerId?:
   });
 }
 
-export async function update(id: string, payload: Partial<TaskPayload>, userId?: string) {
+export async function update(id: string, payload: Partial<TaskPayload>) {
   const task = await prisma.task.findUnique({ where: { id } });
   if (!task) return null;
-  if (userId && task.ownerId !== userId) return null; 
   const data: any = {};
-  if (payload.title) data.title = payload.title;
-  if (payload.description) data.description = payload.description;
-  if (payload.status) data.status = payload.status;
-  if (payload.priority) data.priority = payload.priority;
+  if (payload.title !== undefined) data.title = payload.title;
+  if (payload.description !== undefined) data.description = payload.description;
+  if (payload.status !== undefined) data.status = payload.status;
+  if (payload.priority !== undefined) data.priority = payload.priority;
   return prisma.task.update({ where: { id }, data });
 }
 
-
-export async function remove(id: string, userId?: string) {
+export async function remove(id: string) {
   const task = await prisma.task.findUnique({ where: { id } });
   if (!task) return null;
-  if (userId && task.ownerId !== userId) return null;
   await prisma.task.delete({ where: { id } });
   return true;
 }

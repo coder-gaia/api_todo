@@ -30,15 +30,14 @@ export async function createTask(req: AuthRequest, res: Response) {
 export async function updateTask(req: AuthRequest, res: Response) {
   const { id } = req.params as { id: string };
   const payload = req.body;
-  const updated = await taskService.update(id, payload, req.user?.userId);
+  const updated = await taskService.update(id, payload);
   if (!updated) return res.status(403).json({ message: 'Forbidden or task not found' });
   return res.json(updated);
 }
 
-
 export async function deleteTask(req: AuthRequest, res: Response) {
   const { id } = req.params as { id: string };
-  const removed = await taskService.remove(id, req.user?.userId);
+  const removed = await taskService.remove(id);
   if (!removed) return res.status(403).json({ message: 'Forbidden or task not found' });
   return res.status(204).send();
 }

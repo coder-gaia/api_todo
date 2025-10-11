@@ -23,7 +23,7 @@ export async function login({ email, password }: { email: string; password: stri
   const token = jwt.sign(
     { userId: user.id, username: user.username, role: user.role ?? null },
     JWT_SECRET,
-    { expiresIn: '1d' }
+    { expiresIn: '7d' }
   );
 
   return token;
