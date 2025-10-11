@@ -18,7 +18,7 @@ export function requireOwner() {
 
 export function requireAdminOrOwnerForTask() {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
-    console.log('REQ.USER:', req.user, 'BODY.BOARDID:', req.body?.boardId, 'PARAMS.ID:', req.params?.id);
+    //console.log('REQ.USER:', req.user, 'BODY.BOARDID:', req.body?.boardId, 'PARAMS.ID:', req.params?.id);
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
 
     let boardId: string | null = null;
