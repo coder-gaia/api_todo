@@ -18,7 +18,6 @@ export function requireOwner() {
 
 export function requireAdminOrOwnerForTask() {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
-    //console.log('REQ.USER:', req.user, 'BODY.BOARDID:', req.body?.boardId, 'PARAMS.ID:', req.params?.id);
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
 
     let boardId: string | null = null;
@@ -32,7 +31,15 @@ export function requireAdminOrOwnerForTask() {
 
     if (!boardId) return res.status(400).json({ message: 'Board ID is required' });
 
-    if (req.user.role === 'OWNER') return next();
+    const board = await prisma.board.findUnique({ where: { id: boardId } });
+    if (!board) return res.status(404).json({ message: 'Board not found' });
+
+    if (req.user.role === 'OWNER') {
+      if (board.ownerId !== req.user.userId) {
+        return res.status(403).json({ message: 'Only the board owner can perform this action' });
+      }
+      return next();
+    }
 
     if (req.user.role === 'ADMIN') {
       const membership = await prisma.boardMember.findFirst({ where: { boardId, userId: req.user.userId } });
@@ -43,4 +50,5 @@ export function requireAdminOrOwnerForTask() {
     return res.status(403).json({ message: 'Only OWNER or ADMIN allowed' });
   };
 }
+
 
