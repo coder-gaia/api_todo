@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test:backend": "cross-env DATABASE_URL=file:./test.db JWT_SECRET=testsecret jest"
+    "pretest:backend": "rimraf ./test.db",
+    "test:backend:cov": "cross-env DATABASE_URL=file:./test.db JWT_SECRET=testsecret jest --runInBand --coverage"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "@types/uuid": "^10.0.0",
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
+    "rimraf": "^6.0.1",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",

@@ -9,10 +9,13 @@ describe('Boards integration', () => {
   let boardId: string;
 
   beforeAll(async () => {
-    await prisma.task.deleteMany();
-    await prisma.boardMember.deleteMany();
-    await prisma.board.deleteMany();
-    await prisma.user.deleteMany();
+  await prisma.$connect();
+  await prisma.$transaction([
+    prisma.task.deleteMany(),
+    prisma.boardMember.deleteMany(),
+    prisma.board.deleteMany(),
+    prisma.user.deleteMany()
+  ]);
 
     const ownerRes = await request(app)
       .post('/users/register-admin')

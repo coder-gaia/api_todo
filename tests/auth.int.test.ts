@@ -7,12 +7,15 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
 describe('Auth integration', () => {
-  beforeAll(async () => {
-    await prisma.task.deleteMany();
-    await prisma.boardMember.deleteMany();
-    await prisma.board.deleteMany();
-    await prisma.user.deleteMany();
-  });
+beforeAll(async () => {
+  await prisma.$connect();
+  await prisma.$transaction([
+    prisma.task.deleteMany(),
+    prisma.boardMember.deleteMany(),
+    prisma.board.deleteMany(),
+    prisma.user.deleteMany()
+  ]);
+});
 
   afterAll(async () => {
     await prisma.task.deleteMany();

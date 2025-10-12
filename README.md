@@ -87,15 +87,21 @@ DATABASE_URL="file:./test.db"
 JWT_SECRET="testsecret"
 ```
 
-### 4️⃣ Rodando os Testes
+### 4️⃣ Resetando o banco de dados antes de iniciar
 
 ```bash
-npm run test
+npx prisma migrate reset
+```
+
+### 5️⃣ Rodando os Testes
+
+```bash
+npm run test:backend:cov
 ```
 
 Os testes utilizam o banco `test.db`, garantindo isolamento entre ambiente de desenvolvimento e testes.
 
-### 5️⃣ Executando o Servidor
+### 6️⃣ Executando o Servidor
 
 ```bash
 npm run dev
